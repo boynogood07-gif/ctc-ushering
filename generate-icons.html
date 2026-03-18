@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CTC PWA Icon Generator</title>
+  <style>
+    body { font-family: sans-serif; background: #070d1b; color: #f0e8d8; padding: 30px; }
+    h2 { color: #e4b75c; } button { margin: 8px; padding: 10px 22px; background: #c9922a; color: #070d1b; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 13px; }
+    #icons { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+    canvas { border: 1px solid #1e3055; border-radius: 8px; }
+    p { color: #7a8ba8; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <h2>🎨 CTC Ushering — PWA Icon Generator</h2>
+  <p>Click "Generate & Download All" to create all required PWA icon sizes into your <code>icons/</code> folder.</p>
+  <button onclick="generateAll()">⬇ Generate & Download All Icons</button>
+  <div id="icons"></div>
+
+<script>
+const SIZES = [72, 96, 128, 144, 152, 192, 384, 512];
+
+function drawIcon(size) {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  const s = size;
+
+  // Background
+  const bg = ctx.createLinearGradient(0, 0, s, s);
+  bg.addColorStop(0, '#0d1729');
+  bg.addColorStop(1, '#070d1b');
+  ctx.fillStyle = bg;
+  ctx.beginPath();
+  ctx.roundRect(0, 0, s, s, s * 0.18);
+  ctx.fill();
+
+  // Gold ring
+  ctx.strokeStyle = '#c9922a';
+  ctx.lineWidth = s * 0.035;
+  ctx.beginPath();
+  ctx.roundRect(s*0.06, s*0.06, s*0.88, s*0.88, s*0.14);
+  ctx.stroke();
+
+  // Cross
+  const cx = s / 2, cy = s * 0.44;
+  const cw = s * 0.06, ch = s * 0.38;
+  const grad = ctx.createLinearGradient(cx, cy - ch/2, cx, cy + ch/2);
+  grad.addColorStop(0, '#e4b75c');
+  grad.addColorStop(1, '#c9922a');
+  ctx.fillStyle = grad;
+  ctx.fillRect(cx - cw/2, cy - ch/2, cw, ch);          // vertical
+  ctx.fillRect(cx - ch*0.38, cy - ch*0.12, ch*0.76, cw); // horizontal
+
+  // "CTC" text
+  ctx.fillStyle = '#f0e8d8';
+  ctx.font = `bold ${Math.round(s * 0.14)}px serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('CTC', s / 2, s * 0.83);
+
+  return canvas;
+}
+
+function generateAll() {
+  const container = document.getElementById('icons');
+  container.innerHTML = '';
+  SIZES.forEach(size => {
+    const canvas = drawIcon(size);
+    canvas.title = `${size}x${size}`;
+    container.appendChild(canvas);
+
+    // Trigger download
+    const a = document.createElement('a');
+    a.download = `icon-${size}.png`;
+    a.href = canvas.toDataURL('image/png');
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  });
+  alert('✅ All icons downloaded!\n\nMove them into an "icons/" folder next to usher-dashboard.html');
+}
+</script>
+</body>
+</html>
